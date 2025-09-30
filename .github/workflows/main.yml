@@ -19,7 +19,7 @@ on:
       - infra/runner-toevoegen
  
 jobs:
-  build-android:
+  build:
     runs-on: windows-latest
 
     steps:
