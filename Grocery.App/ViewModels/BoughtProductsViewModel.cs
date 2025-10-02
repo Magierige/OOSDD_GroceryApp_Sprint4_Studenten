@@ -25,13 +25,10 @@ namespace Grocery.App.ViewModels
         partial void OnSelectedProductChanged(Product? oldValue, Product newValue)
         {
             BoughtProductsList.Clear();
-            if (newValue != null)
+            var boughtProducts = _boughtProductsService.Get(newValue.Id);
+            foreach (var item in boughtProducts)
             {
-                var boughtProducts = _boughtProductsService.Get(newValue.Id);
-                foreach (var item in boughtProducts)
-                {
-                    BoughtProductsList.Add(item);
-                }
+                BoughtProductsList.Add(item);
             }
         }
 
