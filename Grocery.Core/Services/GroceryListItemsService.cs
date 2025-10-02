@@ -51,10 +51,14 @@ namespace Grocery.Core.Services
 
         public List<BestSellingProducts> GetBestSellingProducts(int topX = 5)
         {
+            // Get all grocery list items from the repository
             var groceries = _groceriesRepository.GetAll();
+            // dictionary to store productId and total amount sold
             var stats = new Dictionary<int, int>();
+
             foreach (var grocerie in groceries)
             {
+                // if productId already in dictionary, add amount to total else add new entry with amount
                 if (stats.ContainsKey(grocerie.ProductId))
                 {
                     stats[grocerie.ProductId] += grocerie.Amount;
@@ -64,13 +68,18 @@ namespace Grocery.Core.Services
                     stats.Add(grocerie.ProductId, grocerie.Amount);
                 }
             }
+            // order dictionary by total amount sold descending
             var statsOrder = stats.OrderByDescending(kv => kv.Value);
+            // list to store and return best selling products
             List<BestSellingProducts> result = new List<BestSellingProducts>();
+            // default loop is 5 it will be less if there are less than 5 products sold
             int loop = 5;
+            // check if there are less than 5 products sold and adjust loop accordingly
             if (statsOrder.Count() < 5)
             {
                 loop = statsOrder.Count();
             }
+            // loop through the top 5 (or les) best selling products and get product details from product repository and add to result list
             for (int i = 0; i < loop; i++)
             {
                 var item = statsOrder.ElementAt(i);
@@ -81,7 +90,6 @@ namespace Grocery.Core.Services
                 }
             }
             return result;
-            //throw new NotImplementedException();
         }
 
         private void FillService(List<GroceryListItem> groceryListItems)
