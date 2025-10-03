@@ -51,6 +51,16 @@ namespace Grocery.Core.Services
 
         public List<BestSellingProducts> GetBestSellingProducts(int topX = 5)
         {
+            
+            // order dictionary by total amount sold descending
+            var statsOrder = this.CountProductSales().OrderByDescending(kv => kv.Value);
+            // list to store and return best selling products
+            List<BestSellingProducts> result = ListTopProducts(topX,statsOrder);            
+            return result;
+        }
+
+        private Dictionary<int, int> CountProductSales()
+        {
             // Get all grocery list items from the repository
             var groceries = _groceriesRepository.GetAll();
             // dictionary to store productId and total amount sold
@@ -68,17 +78,12 @@ namespace Grocery.Core.Services
                     stats.Add(grocerie.ProductId, grocerie.Amount);
                 }
             }
-            // order dictionary by total amount sold descending
-            var statsOrder = stats.OrderByDescending(kv => kv.Value);
-            // list to store and return best selling products
+            return stats;
+        }
+        private List<BestSellingProducts> ListTopProducts(int topX, IOrderedEnumerable<KeyValuePair<int,int>> statsOrder)
+        {
             List<BestSellingProducts> result = new List<BestSellingProducts>();
-            // default loop is 5 it will be less if there are less than 5 products sold
-            int loop = 5;
-            // check if there are less than 5 products sold and adjust loop accordingly
-            if (statsOrder.Count() < 5)
-            {
-                loop = statsOrder.Count();
-            }
+            int loop = this.CheckLength(topX, statsOrder);
             // loop through the top 5 (or les) best selling products and get product details from product repository and add to result list
             for (int i = 0; i < loop; i++)
             {
@@ -86,18 +91,26 @@ namespace Grocery.Core.Services
                 var product = _productRepository.Get(item.Key);
                 if (product != null)
                 {
-                    result.Add(new BestSellingProducts(product.Id, product.Name, product.Stock, item.Value, i+1));
+                    result.Add(new BestSellingProducts(product.Id, product.Name, product.Stock, item.Value, i + 1));
                 }
-            }
+            } 
             return result;
         }
-
         private void FillService(List<GroceryListItem> groceryListItems)
         {
             foreach (GroceryListItem g in groceryListItems)
             {
                 g.Product = _productRepository.Get(g.ProductId) ?? new(0, "", 0);
             }
+        }
+        private int CheckLength(int topX, IOrderedEnumerable<KeyValuePair<int, int>> statsOrder)
+        {
+            int loop = topX;
+            if (statsOrder.Count() < topX)
+            {
+                loop = statsOrder.Count();
+            }
+            return loop;
         }
     }
 }
