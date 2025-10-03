@@ -9,7 +9,8 @@
     <Shell.TitleView>
         <Grid>
             <Label Text="Boodschappenlijsten" FontSize="Large" HorizontalOptions="Center" VerticalOptions="Center" />
-            
+            <Button WidthRequest="150" HeightRequest="50" HorizontalOptions="End" Text="{Binding CurrentClient.Name}"   Command="{Binding ShowBoughtProductsClick}"/>
+
         </Grid>
     </Shell.TitleView>
 
